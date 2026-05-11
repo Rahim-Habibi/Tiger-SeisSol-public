@@ -1,6 +1,6 @@
 # Tiger Notes
 
-- Tiger repo: https://github.com/Thomas-Ulrich/tiger/tree/thomas/check_failure Mind the branch used
+- Tiger repo: https://github.com/Rahim-Habibi/tiger-failure Mind the branch used
 
 - Procedure to install Tiger: https://www.m2clab.com/tiger/installation
 
