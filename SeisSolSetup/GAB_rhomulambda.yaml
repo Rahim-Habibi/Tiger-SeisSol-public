@@ -1,0 +1,6 @@
+!ConstantMap
+  map:
+    # E = 15e9, poisson=0.2
+    rho:    2500.0
+    mu:     6.250000e+09
+    lambda: 4.166667e+09
