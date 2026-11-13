@@ -1,0 +1,42 @@
+!Switch
+[mu_d, mu_s, d_c]: !ConstantMap
+  map:
+    mu_d: 0.2
+    mu_s: 0.6
+    d_c: 0.1
+[s_xx,s_xy,s_xz,s_yy,s_yz,s_zz]: !IdentityMap
+  components: 
+    - !AffineMap
+          matrix:
+            ua: [1.0,0.0, 0.0]
+            ub: [0.0, 1.0, 0.0]
+            uc: [0.0, 0.0, 1.0]
+          translation:
+            ua: 0.0
+            ub: 0.0
+            uc: 0.0
+          components: !Any    
+            - !ASAGI
+                file: ASAGI_files/gridded_asagi_dx20_near_wells.nc
+                parameters: [s_xx,s_xy,s_xz,s_yy,s_yz,s_zz]
+                var: data
+                interpolation: linear
+            - !ASAGI
+                file: ASAGI_files/gridded_asagi_dx50_background.nc
+                parameters: [s_xx,s_xy,s_xz,s_yy,s_yz,s_zz]
+                var: data
+                interpolation: linear
+            - !ConstantMap
+                map:
+                 s_xx: -10e6
+                 s_xy: 0
+                 s_xz: 0
+                 s_yy: -10e6
+                 s_yz: 0
+                 s_zz: -10e6
+[Tnuc_n, Tnuc_s, Tnuc_d, cohesion]: !ConstantMap
+    map:
+        Tnuc_n: 0
+        Tnuc_s: 0
+        Tnuc_d: 0
+        cohesion: 0
