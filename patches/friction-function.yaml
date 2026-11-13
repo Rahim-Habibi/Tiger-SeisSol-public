@@ -1,0 +1,40 @@
+!Switch
+[mu_d, d_c]: !ConstantMap
+  map:
+    mu_d: 0.13
+    d_c: 0.003
+
+[mu_s]: !LuaMap
+  returns: [mu_s]
+  function: |
+    function f(x)
+      -- Helper to return a unique mu_s if inside a given sphere
+      local function in_circle(cx, cy, cz, r1, mu_s_val)
+        local dx = x["x"] - cx
+        local dy = x["y"] - cy
+        local dz = x["z"] - cz
+        local r = math.sqrt(dx*dx + dy*dy + dz*dz)
+        if r <= r1 then
+          return mu_s_val
+        else
+          return nil
+        end
+      end
+
+      -- Check each circle with its own mu_s value
+      local mu_s =
+        in_circle(46.991, 46.9912, -896.012, 12.5, 0.17) or
+        0.6  -- default value
+
+      return {
+        mu_s = mu_s
+      }
+    end
+
+[T_s, T_d, T_n]: !Include TsTdTn.yaml
+[Tnuc_n, Tnuc_s, Tnuc_d, cohesion]: !ConstantMap
+  map:
+    Tnuc_n: 0
+    Tnuc_s: 0
+    Tnuc_d: 0
+    cohesion: 0
