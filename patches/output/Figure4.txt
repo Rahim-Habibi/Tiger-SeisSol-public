@@ -1,0 +1,80 @@
+import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
+
+# === Scenario configuration ===
+scenario_files = [
+    '/mnt/d/2nd-paper/diagram/CFS-in-patches/T-6390-CFS-change-two-weak-patch.csv',
+    '/mnt/d/2nd-paper/diagram/CFS-in-patches/T-3162-CFS-change-two-weak-patch.csv',
+    '/mnt/d/2nd-paper/diagram/CFS-in-patches/T-13765-CFS-change-two-weak-patch.csv',
+    '/mnt/d/2nd-paper/diagram/CFS-in-patches/T-8209-CFS-change-two-weak-patch.csv'  # <-- add your 4th dataset here
+]
+labels = ['A', 'C', 'I', 'B']
+colors = ['blue', 'fuchsia', 'red', 'lime']
+
+# Quasi-static regime boundary
+qs_end_x = 5
+
+fig, ax = plt.subplots(figsize=(14, 6))
+
+# Background shading for quasi-static regime
+#ax.axvspan(0, qs_end_x, color='lightblue', alpha=0.2, label='Quasi-static regime')
+
+#qs_time_all = []
+
+# Plot all quasi-static curves
+for i, file in enumerate(scenario_files):
+    df = pd.read_csv(file)
+    qs_time_sec = df.iloc[:, 0].dropna().astype(float).to_numpy()
+    qs_pressure = df.iloc[:, 1].dropna().astype(float).to_numpy() / 1000000
+
+    qs_time_days = qs_time_sec / 86400
+    qs_time_all.append(qs_time_days)
+
+    # Normalize to fixed x-axis [0, qs_end_x]
+    qs_x = np.interp(qs_time_days, (qs_time_days.min(), qs_time_days.max()), (0, qs_end_x))
+    
+    ax.plot(qs_x, qs_pressure, color=colors[i], linewidth=2, label=f'{labels[i]}')
+
+    # Top axis (disabled ticks and labels)
+    if i > 0:
+        twin = ax.twiny()
+        twin.spines["top"].set_position(("axes", 1.0 + 0.1 * (i - 1)))
+        twin.set_frame_on(True)
+        twin.patch.set_visible(False)
+        twin.set_xlim(0, qs_end_x)
+        twin.set_xticks([])
+        twin.set_xticklabels([])
+
+# === Main bottom x-axis ticks and labels ===
+qs_days_single = qs_time_all[0]
+qs_ticks_real_days = np.linspace(qs_days_single.min(), qs_days_single.max(), 4)
+qs_ticks_plot = np.interp(qs_ticks_real_days, (qs_days_single.min(), qs_days_single.max()), (0, qs_end_x))
+qs_labels = [f'{t:.1f} ' for t in qs_ticks_real_days]
+
+# X-axis ticks
+ax.set_xticks(qs_ticks_plot)
+ax.set_xticklabels(qs_labels, fontsize=15, fontweight='bold')
+ax.tick_params(axis='x', direction='out', length=5)
+
+# Y-axis ticks
+ax.tick_params(axis='y', labelsize=15)
+for label in ax.get_yticklabels():
+    label.set_fontweight('bold')
+
+# Axis labels and styling
+ax.set_xlabel('Time [day]', fontsize=15, fontweight='bold')
+ax.set_ylabel('Coulomb Stress [MPa]', fontsize=15, fontweight='bold')
+ax.set_xlim(0, qs_end_x)
+#ax.set_ylim(-8.5e6, 0.2e6) #=== User-defined y-axis range, you can remove it if you want to set based on the data range ===
+#ax.set_title('Coulomb Stress Evolution – Quasi-static (scenario 2)', fontsize=15, fontweight='bold')
+ax.grid(True, linestyle='--', color='grey', linewidth=0.5)
+ax.tick_params(axis='y', labelsize=15)
+
+# Legend
+ax.legend(loc='lower right', fontsize=13, frameon=True).set_title('Legend', prop={'size': 15, 'weight': 'bold'})
+
+# Save and show
+plt.tight_layout()
+plt.savefig(r'/mnt/d/2nd-paper/diagram/CFS-in-patches/second-scenarios-quasistatic-only.png', dpi=300, bbox_inches='tight')
+plt.show()
